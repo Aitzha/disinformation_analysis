@@ -17,24 +17,25 @@ why people believe disinformation about healthcare.
 - Virtualenv (optional, but recommended)
 
 ### Clone the Repository
-```bash
+```
 git clone https://github.com/yourusername/yourproject.git
 cd yourproject
 ```
 
 ### Create and Activate a Virtual Environment for Windows
-```bash
+```
 python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
 
 ### Install Dependencies
-```bash
-pip install -r factory_boy
+```
+pip install factory_boy
+pip install djangorestframework
 ```
 
 ### Testing
-```bash
+```
 python manage.py test
 ```
 
