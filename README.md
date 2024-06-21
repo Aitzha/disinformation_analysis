@@ -34,6 +34,11 @@ pip install factory_boy
 pip install djangorestframework
 ```
 
+### Migration
+```
+python manage.py migrate
+```
+
 ### Testing
 ```
 python manage.py test
