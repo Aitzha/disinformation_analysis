@@ -37,6 +37,8 @@ pip install djangorestframework
 ### Migration
 ```
 python manage.py migrate
+$env:PROJECT_PATH="path"
+python .\scripts\populate_healthcare_disinformation.py
 ```
 
 ### Testing
