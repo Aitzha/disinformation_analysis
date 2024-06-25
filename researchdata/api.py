@@ -26,3 +26,15 @@ def user_info(request, user_id):
                          "personality": serialized_personality.data}
 
         return JsonResponse(combined_data)
+
+@csrf_exempt
+def simple_user_info(request, user_id):
+    try:
+        user = User.objects.get(user_id=user_id)
+    except User.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == "GET":
+        serialized_user = UserSerializer(user)
+
+        return JsonResponse(serialized_user.data)

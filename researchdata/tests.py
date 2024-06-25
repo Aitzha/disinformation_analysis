@@ -13,26 +13,37 @@ class ResearchTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_UserInfoAPI_returnSuccess(self):
+    def test_userInfoAPI_userAndPersonalityExist_returnSuccess(self):
         user = UserFactory.create()
         personality = PersonalityFactory.create(user_id=user)
         url = reverse('user_info_api', kwargs={'user_id': user.user_id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data['user']['user_id'], user.user_id)
 
-    def test_UserInfoAPI_returnNotFound(self):
-        user = UserFactory.create()
-        personality = PersonalityFactory.create(user_id=user)
-        url = reverse('user_info_api', kwargs={'user_id': user.user_id + 1})
+    def test_userInfoAPI_userDoNotExist_returnNotFound(self):
+        url = reverse('user_info_api', kwargs={'user_id': 0})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_UserInfoAPI_returnUser(self):
+    def test_userInfoAPI_personalityDoNotExist_returnNotFound(self):
         user = UserFactory.create()
-        personality = PersonalityFactory.create(user_id=user)
         url = reverse('user_info_api', kwargs={'user_id': user.user_id})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 404)
 
+
+    def test_userSimpleInfoAPI_userExist_returnSuccess(self):
+        user = UserFactory.create()
+        url = reverse('simple_user_info_api', kwargs={'user_id': user.user_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
         response_data = response.json()
-        self.assertEqual(response_data['user']['user_id'], user.user_id)
+        self.assertEqual(response_data['user_id'], user.user_id)
+
+    def test_userSimpleInfoAPI_userDoNotExist_returnNotFound(self):
+        url = reverse('simple_user_info_api', kwargs={'user_id': 0})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
