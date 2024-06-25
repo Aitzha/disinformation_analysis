@@ -10,7 +10,9 @@ class UserSerializer(serializers.ModelSerializer):
 class PersonalitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Personality
-        fields = ["user_id", "mac1", "mac2", "mac3", "mac4"]
+        fields = ["user_id", "mac1", "mac2", "mac3", "mac4", "mac5", "mac6", "mac7", "mac8", "mac9", "mac10", "mac11",
+                  "smds1", "smds2", "smds3", "smds4", "smds5", "smds6", "smds7", "smds8", "smds9", "smds10", "smds11", "smds12",
+                  "risk1", "risk2", "risk3", "risk4", "risk5", "risk6", "risk7"]
 
 
 class ResponseSerializer(serializers.ModelSerializer):
