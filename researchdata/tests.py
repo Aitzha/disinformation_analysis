@@ -26,6 +26,12 @@ class ResearchTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_simpleUserInfoAPI_sendPostRequest_returnNotFound(self):
+        url = reverse('simple_user_info_api', kwargs={'user_id': 0})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
+
+
     def test_simpleUserResponseAPI_userExistAndZeroResponses_returnSuccess(self):
         user = UserFactory.create()
         url = reverse('simple_user_response_api', kwargs={'user_id': user.user_id})
@@ -51,6 +57,12 @@ class ResearchTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_simpleUserResponseAPI_sendPostRequest_returnNotFound(self):
+        url = reverse('simple_user_response_api', kwargs={'user_id': 0})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
+
+
     def test_userInfoAPI_userAndPersonalityExist_returnSuccess(self):
         user = UserFactory.create()
         personality = PersonalityFactory.create(user=user)
@@ -70,6 +82,11 @@ class ResearchTest(APITestCase):
         url = reverse('user_info_api', kwargs={'user_id': user.user_id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_userInfoAPI_sendPostRequest_returnNotFound(self):
+        url = reverse('user_info_api', kwargs={'user_id': 0})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
 
     def test_userResponseAPI_userExistAndZeroResponses_returnSuccess(self):
         user = UserFactory.create()
@@ -97,3 +114,8 @@ class ResearchTest(APITestCase):
         url = reverse('user_response_api', kwargs={'user_id': 0})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_userResponseAPI_sendPostRequest_returnNotFound(self):
+        url = reverse('user_response_api', kwargs={'user_id': 0})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
