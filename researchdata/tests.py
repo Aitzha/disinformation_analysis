@@ -71,3 +71,29 @@ class ResearchTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_userResponseAPI_userExistAndZeroResponses_returnSuccess(self):
+        user = UserFactory.create()
+        url = reverse('user_response_api', kwargs={'user_id': user.user_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data['user']['user_id'], user.user_id)
+        self.assertEqual(len(response_data['responses']), 0)
+
+    def test_userResponseAPI_userExistAndTwoResponses_returnSuccess(self):
+        user = UserFactory.create()
+        post1 = PostFactory.create(post_id=0)
+        post2 = PostFactory.create(post_id=1)
+        response1 = ResponseFactory.create(user=user, post=post1)
+        response1 = ResponseFactory.create(user=user, post=post2)
+        url = reverse('user_response_api', kwargs={'user_id': user.user_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data['user']['user_id'], user.user_id)
+        self.assertEqual(len(response_data['responses']), 2)
+
+    def test_userResponseAPI_userDoNotExist_returnNotFound(self):
+        url = reverse('user_response_api', kwargs={'user_id': 0})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)

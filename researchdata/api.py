@@ -24,14 +24,31 @@ def simple_user_info(request, user_id):
 def simple_user_responses(request, user_id):
     try:
         user = User.objects.get(user_id=user_id)
-        user_responses = Response.objects.filter(user_id=user_id)
+        responses = Response.objects.filter(user_id=user_id)
     except User.DoesNotExist:
         return HttpResponse(status=404)
 
     if request.method == "GET":
-        serialized_responses = ResponseSerializer(user_responses, many=True)
+        serialized_responses = ResponseSerializer(responses, many=True)
 
         return JsonResponse(serialized_responses.data, safe=False)
+
+@csrf_exempt
+def user_responses(request, user_id):
+    try:
+        user = User.objects.get(user_id=user_id)
+        responses = Response.objects.filter(user_id=user_id)
+    except User.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == "GET":
+        serialized_user = UserSerializer(user)
+        serialized_responses = ResponseSerializer(responses, many=True)
+
+        combined_data = {"user": serialized_user.data,
+                         "responses": serialized_responses.data}
+
+        return JsonResponse(combined_data)
 
 @csrf_exempt
 def user_info(request, user_id):
