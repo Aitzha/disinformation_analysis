@@ -13,6 +13,44 @@ class ResearchTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_simpleUserInfoAPI_userExist_returnSuccess(self):
+        user = UserFactory.create()
+        url = reverse('simple_user_info_api', kwargs={'user_id': user.user_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data['user_id'], user.user_id)
+
+    def test_simpleUserInfoAPI_userDoNotExist_returnNotFound(self):
+        url = reverse('simple_user_info_api', kwargs={'user_id': 0})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_simpleUserResponseAPI_userExistAndZeroResponses_returnSuccess(self):
+        user = UserFactory.create()
+        url = reverse('simple_user_response_api', kwargs={'user_id': user.user_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(len(response_data), 0)
+
+    def test_simpleUserResponseAPI_userExistAndTwoResponses_returnSuccess(self):
+        user = UserFactory.create()
+        post1 = PostFactory.create(post_id=0)
+        post2 = PostFactory.create(post_id=1)
+        response1 = ResponseFactory.create(user=user, post=post1)
+        response1 = ResponseFactory.create(user=user, post=post2)
+        url = reverse('simple_user_response_api', kwargs={'user_id': user.user_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(len(response_data), 2)
+
+    def test_simpleUserResponseAPI_userDoNotExist_returnNotFound(self):
+        url = reverse('simple_user_response_api', kwargs={'user_id': 0})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
     def test_userInfoAPI_userAndPersonalityExist_returnSuccess(self):
         user = UserFactory.create()
         personality = PersonalityFactory.create(user=user)
@@ -30,20 +68,6 @@ class ResearchTest(APITestCase):
     def test_userInfoAPI_personalityDoNotExist_returnNotFound(self):
         user = UserFactory.create()
         url = reverse('user_info_api', kwargs={'user_id': user.user_id})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
-
-
-    def test_userSimpleInfoAPI_userExist_returnSuccess(self):
-        user = UserFactory.create()
-        url = reverse('simple_user_info_api', kwargs={'user_id': user.user_id})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        response_data = response.json()
-        self.assertEqual(response_data['user_id'], user.user_id)
-
-    def test_userSimpleInfoAPI_userDoNotExist_returnNotFound(self):
-        url = reverse('simple_user_info_api', kwargs={'user_id': 0})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
