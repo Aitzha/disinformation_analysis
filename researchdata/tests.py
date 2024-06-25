@@ -15,7 +15,7 @@ class ResearchTest(APITestCase):
 
     def test_userInfoAPI_userAndPersonalityExist_returnSuccess(self):
         user = UserFactory.create()
-        personality = PersonalityFactory.create(user_id=user)
+        personality = PersonalityFactory.create(user=user)
         url = reverse('user_info_api', kwargs={'user_id': user.user_id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

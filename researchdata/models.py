@@ -21,7 +21,7 @@ class Post(models.Model):
 
 
 class Personality(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     mac1 = models.IntegerField()
     mac2 = models.IntegerField()
     mac3 = models.IntegerField()
@@ -54,8 +54,8 @@ class Personality(models.Model):
     risk7 = models.IntegerField()
 
 class Response(models.Model):
-    post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     reason = models.CharField(max_length=512, null=False, blank=False)
     verbal_code = models.CharField(max_length=256, null=False, blank=False)
     post_status_opinion = models.CharField(max_length=256, null=False, blank=False)

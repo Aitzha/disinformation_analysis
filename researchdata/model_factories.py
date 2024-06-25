@@ -16,36 +16,9 @@ class UserFactory(factory.django.DjangoModelFactory):
         model = User
 
 class PersonalityFactory(factory.django.DjangoModelFactory):
-    user_id = factory.SubFactory(UserFactory)
-    mac1 = 0
-    mac2 = 0
-    mac3 = 0
-    mac4 = 0
-    mac5 = 0
-    mac6 = 0
-    mac7 = 0
-    mac8 = 0
-    mac9 = 0
-    mac10 = 0
-    mac11 = 0
-    smds1 = 0
-    smds2 = 0
-    smds3 = 0
-    smds4 = 0
-    smds5 = 0
-    smds6 = 0
-    smds7 = 0
-    smds8 = 0
-    smds9 = 0
-    smds10 = 0
-    smds11 = 0
-    smds12 = 0
-    risk1 = 0
-    risk2 = 0
-    risk3 = 0
-    risk4 = 0
-    risk5 = 0
-    risk6 = 0
-    risk7 = 0
+    user = factory.SubFactory(UserFactory)
+    mac1 = mac2 = mac3 = mac4 = mac5 = mac6 = mac7 = mac8 = mac9 = mac10 = mac11 = 0
+    smds1 = smds2 = smds3 = smds4 = smds5 = smds6 = smds7 = smds8 = smds9 = smds10 = smds11 = smds12 = 0
+    risk1 = risk2 = risk3 = risk4 = risk5 = risk6 = risk7 = 0
     class Meta:
         model = Personality
