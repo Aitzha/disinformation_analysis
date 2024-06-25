@@ -7,7 +7,7 @@ from .models import *
 
 class UserFactory(factory.django.DjangoModelFactory):
     user_id = 0
-    gender = "male"
+    gender = "female"
     birth_year = 2000
     ethnicity = "white"
     parent_edu = "advanced degree"
@@ -22,3 +22,22 @@ class PersonalityFactory(factory.django.DjangoModelFactory):
     risk1 = risk2 = risk3 = risk4 = risk5 = risk6 = risk7 = 0
     class Meta:
         model = Personality
+
+class PostFactory(factory.django.DjangoModelFactory):
+    post_id = 0
+    name = "Example post name"
+    nature = True
+
+    class Meta:
+        model = Post
+
+class ResponseFactory(factory.django.DjangoModelFactory):
+    post = factory.SubFactory(PostFactory)
+    user = factory.SubFactory(UserFactory)
+    reason = "Some reason"
+    verbal_code = "Seems legit"
+    post_status_opinion = "True"
+    correctness = True
+
+    class Meta:
+        model = Response
