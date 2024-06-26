@@ -169,3 +169,34 @@ class ResearchTest(APITestCase):
         url = reverse('post_info_api', kwargs={'post_id': 0})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
+
+    def test_detailedPostInfoAPI_postExistAndNoResponse_returnSuccess(self):
+        post = PostFactory.create()
+        url = reverse('detailed_post_info_api', kwargs={'post_id': post.post_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data['post']['post_id'], post.post_id)
+        self.assertEqual(response_data['total_response_amount'], 0)
+
+    def test_detailedPostInfoAPI_postExistAndTwoResponses_returnSuccess(self):
+        user = UserFactory.create()
+        post = PostFactory.create()
+        ResponseFactory.create(user=user, post=post)
+        ResponseFactory.create(user=user, post=post)
+        url = reverse('detailed_post_info_api', kwargs={'post_id': post.post_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data['post']['post_id'], post.post_id)
+        self.assertEqual(response_data['total_response_amount'], 2)
+
+    def test_detailedPostInfoAPI_postDoNotExist_returnNotFound(self):
+        url = reverse('detailed_post_info_api', kwargs={'post_id': 0})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_detailedPostInfoAPI_sendPostRequest_returnNotFound(self):
+        url = reverse('detailed_post_info_api', kwargs={'post_id': 0})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)

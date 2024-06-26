@@ -115,3 +115,38 @@ def post_info(request, post_id):
                      "questionable_assumption_user_ids": list(questionable_assumption_user_ids)}
 
     return JsonResponse(combined_data)
+
+@csrf_exempt
+def detailed_post_info(request, post_id):
+    if request.method != "GET":
+        return HttpResponse(status=405)
+
+    try:
+        post = Post.objects.get(post_id=post_id)
+        true_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="True")
+        false_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="False")
+        questionable_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="dont know")
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+
+    serialized_post = PostSerializer(post)
+    serialized_true_assumption_responses = ResponseSerializer(true_assumption_responses, many=True)
+    serialized_false_assumption_responses = ResponseSerializer(false_assumption_responses, many=True)
+    serialized_questionable_assumption_responses = ResponseSerializer(questionable_assumption_responses, many=True)
+
+    # Extract user IDs of those who assumed the post is true, false and questionable
+    true_assumption_user_ids = true_assumption_responses.values_list('user_id', flat=True)
+    false_assumption_user_ids = false_assumption_responses.values_list('user_id', flat=True)
+    questionable_assumption_user_ids = questionable_assumption_responses.values_list('user_id', flat=True)
+    response_amount = len(true_assumption_user_ids) + len(false_assumption_user_ids) + len(questionable_assumption_user_ids)
+
+    combined_data = {"post": serialized_post.data,
+                     "total_response_amount": response_amount,
+                     "true_assumption_user_ids": list(true_assumption_user_ids),
+                     "false_assumption_user_ids": list(false_assumption_user_ids),
+                     "questionable_assumption_user_ids": list(questionable_assumption_user_ids),
+                     "true_assumption_responses": serialized_true_assumption_responses.data,
+                     "false_assumption_responses": serialized_false_assumption_responses.data,
+                     "questionable_assumption_responses": serialized_questionable_assumption_responses.data}
+
+    return JsonResponse(combined_data)
