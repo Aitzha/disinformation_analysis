@@ -63,6 +63,25 @@ class ResearchTest(APITestCase):
         self.assertEqual(response.status_code, 405)
 
 
+    def test_simplePostInfoAPI_userExist_returnSuccess(self):
+        post = PostFactory.create()
+        url = reverse('simple_post_info_api', kwargs={'post_id': post.post_id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data['post_id'], post.post_id)
+
+    def test_simplePostInfoAPI_userDoNotExist_returnNotFound(self):
+        url = reverse('simple_post_info_api', kwargs={'post_id': 0})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_simplePostInfoAPI_sendPostRequest_returnNotFound(self):
+        url = reverse('simple_post_info_api', kwargs={'post_id': 0})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
+
+
     def test_userInfoAPI_userAndPersonalityExist_returnSuccess(self):
         user = UserFactory.create()
         personality = PersonalityFactory.create(user=user)

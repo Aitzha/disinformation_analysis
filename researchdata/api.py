@@ -36,6 +36,20 @@ def simple_user_responses(request, user_id):
     return JsonResponse(serialized_responses.data, safe=False)
 
 @csrf_exempt
+def simple_post_info(request, post_id):
+    if request.method != "GET":
+        return HttpResponse(status=405)
+
+    try:
+        post = Post.objects.get(post_id=post_id)
+    except Post.DoesNotExist:
+        return HttpResponse(status=404)
+
+    serialized_post = PostSerializer(post)
+    return JsonResponse(serialized_post.data)
+
+
+@csrf_exempt
 def user_responses(request, user_id):
     if request.method != "GET":
         return HttpResponse(status=405)
