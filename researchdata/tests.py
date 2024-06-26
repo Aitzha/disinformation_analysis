@@ -200,3 +200,25 @@ class ResearchTest(APITestCase):
         url = reverse('detailed_post_info_api', kwargs={'post_id': 0})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
+
+    def test_rankedUsersAPI_noUsersExist_returnSuccess(self):
+        url = reverse('users_ranked_api')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(len(response_data), 0)
+
+    def test_rankedUsersAPI_twoUsersExist_returnSuccess(self):
+        UserFactory.create(user_id=0)
+        UserFactory.create(user_id=1)
+        url = reverse('users_ranked_api')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(len(response_data), 2)
+
+    def test_rankedUsersAPI_sendPostRequest_returnNotFound(self):
+        url = reverse('users_ranked_api')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
+

@@ -150,3 +150,21 @@ def detailed_post_info(request, post_id):
                      "questionable_assumption_responses": serialized_questionable_assumption_responses.data}
 
     return JsonResponse(combined_data)
+
+@csrf_exempt
+def users_ranked(request):
+    if request.method != "GET":
+        return HttpResponse(status=405)
+
+    users = User.objects.all()
+    json = {}
+    count = 0
+    for user in users:
+        user_data = {
+            "user": UserSerializer(user).data,
+            "correct_responses": len(Response.objects.filter(user_id=user.user_id, correctness=True))
+        }
+        json[count] = user_data
+        count += 1
+
+    return JsonResponse(json)
