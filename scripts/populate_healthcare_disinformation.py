@@ -13,11 +13,13 @@ from researchdata.models import *
 project_path = os.getenv('PROJECT_PATH')
 heathcare_disinfo_data = project_path + "/data/Healthcare_Disinfo_Study_Data.csv"
 posts_info_data = project_path + "/data/Posts_info.csv"
+variables_info_data = project_path + "/data/Variables_info.csv"
 
 users = defaultdict(list)
 personalities = defaultdict(list)
 responses = []
 posts = defaultdict(list)
+variables = defaultdict(list)
 
 with open(heathcare_disinfo_data) as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=",")
@@ -42,11 +44,19 @@ with open(posts_info_data) as csv_file:
         posts[row[0]] = row[1:3]
 
 print("Successfully read posts data csv file")
+with open(variables_info_data) as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=",")
+    next(csv_reader, None)
+
+    for row in csv_reader:
+        variables[row[0]] = row[1:3]
+
 
 Personality.objects.all().delete()
 User_Response.objects.all().delete()
 Post.objects.all().delete()
 User.objects.all().delete()
+Variable.objects.all().delete()
 
 print("Successfully deleted all data from database")
 
@@ -84,7 +94,7 @@ for user_id, data in personalities.items():
     if not user_objects.__contains__(user_id):
         continue
 
-    newPersonality = Personality.objects.create(user_id=user_objects[user_id],
+    newPersonality = Personality.objects.create(user=user_objects[user_id],
                                                 mac1=int(data[0]),
                                                 mac2=int(data[1]),
                                                 mac3=int(data[2]),
@@ -141,6 +151,15 @@ for post_id, data in posts.items():
 
 print("Successfully saved posts data")
 
+for variable_name, data in variables.items():
+    newVariable = Variable.objects.create(name=variable_name,
+                                          description=data[0],
+                                          range=data[1])
+
+    newVariable.save()
+
+print("Successfully saved posts data")
+
 all_responses = len(responses)
 responses_loaded = 0
 for response in responses:
@@ -153,14 +172,17 @@ for response in responses:
     if response[5] != '1' and response[5] != '2':
         continue
 
-    post_status_opinionDict = {'0': 'dont know', '1': 'False', '2': 'True'}
+    assumptionDict = {'0': 'questionable', '1': 'False', '2': 'True'}
     correctnessDict = {'1': True, '2': False}
-    newResponse = User_Response.objects.create(post_id=posts_objects[response[0]],
-                                               user_id=user_objects[response[1]],
+    natureDict = {'TRUE': True, 'FALSE': False}
+
+    assumption = assumptionDict.get(response[4], 'questionable') == 'True'
+    newResponse = User_Response.objects.create(post=posts_objects[response[0]],
+                                               user=user_objects[response[1]],
                                                reason=response[2],
-                                               verbal_code=response[3],
-                                               post_status_opinion=post_status_opinionDict.get(response[4], 'dont know'),
-                                               correctness=correctnessDict.get(response[5]))
+                                               generalized_reason=response[3],
+                                               assumption=assumptionDict.get(response[4], 'questionable'),
+                                               correctness=(assumption == natureDict.get(posts[response[0]][1], False)))
 
     newResponse.save()
     responses_loaded += 1
