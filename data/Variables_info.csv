@@ -1,0 +1,31 @@
+Name,Description,Range
+MAC1,I don’t like to have to do a lot of thinking.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC2,I try to avoid situations that require thinking in depth about something.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC3,I prefer to do something that challenges my thinking abilities rather than something that requires little thought.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC4,I prefer complex to simple problems.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC5,Thinking hard and for a long time about something gives me little satisfaction.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC6,"If I am misinformed by the news media, it is my own behavior that determines how soon I will learn credible information.",1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC7,I am in control of the information I get from the news media.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC8,"When I am misinformed by the news media, I am to blame.",1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC9,The main thing that affects my knowledge about the world is what I myself do.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC10,"If I pay attention to different sources of news, I can avoid being misinformed.",1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+MAC11,"If I take the right actions, I can stay informed.",1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS1,I am looking for news about the coronavirus disease (COVID-19) in social networks.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS2,People who are part of my social networks disseminate information about the coronavirus (COVID-19).,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS3,All news regarding the coronavirus disease (COVID-19) is accessible to me from my social networks.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS4,I never worry about finding information about the coronavirus (COVID-19) from social media.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS5,I trust the information disseminated on social networks about the coronavirus disease (COVID-19).,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS6,News on social media about the coronavirus disease (COVID-19) are credible in its majorities.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS7,The information disseminated on social networks about the disease of the coronavirus (COVID-19) is credible to me.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS8,I never trust information posted on social media about the coronavirus disease (COVID-19).,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS9,I share all coronavirus disease (COVID-19) information on social media.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS10,I choose the information related to the coronavirus disease (COVID-19) that I share.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS11,I often rebroadcast information I receive about coronavirus disease (COVID-19).,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+SMDS12,People on my social networks often receive information related to coronavirus disease (COVID-19) from my account.,1 = strongly agree; 2 = agree; 3 = neutral; 4 = disagree; 5 = strongly disagree
+Risk1,Safety first.,1 = totally disagree; 5 = neutral; 9 = totally agree
+Risk2,I do not take risks with my health.,1 = totally disagree; 5 = neutral; 9 = totally agree
+Risk3,I prefer to avoid risks,1 = totally disagree; 5 = neutral; 9 = totally agree
+Risk4,I take risks regularly.,1 = totally disagree; 5 = neutral; 9 = totally agree
+Risk5,I really dislike not knowing what is going to happen.,1 = totally disagree; 5 = neutral; 9 = totally agree
+Risk6,I usually view risks as a challenge.,1 = totally disagree; 5 = neutral; 9 = totally agree
+Risk7,I view myself as a …,1 = risk avoider; 5 = neutral; 9 = risk seeker
