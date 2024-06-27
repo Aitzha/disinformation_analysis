@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response as Rest_Response
 from rest_framework import status
 from .serializers import *
+from collections import OrderedDict
 
 @csrf_exempt
 def check(request):
@@ -134,14 +135,17 @@ def detailed_post_info(request, post_id):
 @api_view(['GET'])
 def users_ranked(request):
     users = User.objects.all()
-    json = {}
-    count = 0
+    user_data_list = []
     for user in users:
         user_data = {
             "user": UserSerializer(user).data,
             "correct_responses": len(Response.objects.filter(user_id=user.user_id, correctness=True))
         }
-        json[count] = user_data
-        count += 1
+        user_data_list.append(user_data)
+
+    user_data_list.sort(key=lambda x: x['correct_responses'], reverse=True)
+    json = OrderedDict()
+    for index, user_data in enumerate(user_data_list):
+        json[index] = user_data
 
     return Rest_Response(json)
