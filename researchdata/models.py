@@ -21,7 +21,7 @@ class Post(models.Model):
 
 
 class Variable(models.Model):
-    name = models.CharField(max_length=256, null=False, blank=False, primary_key=True)
+    name = models.CharField(max_length=8, null=False, blank=False, primary_key=True)
     description = models.CharField(max_length=256, null=False, blank=False)
     range = models.CharField(max_length=256, null=False, blank=False)
 

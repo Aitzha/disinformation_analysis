@@ -80,7 +80,7 @@ def post_info(request, post_id):
         post = Post.objects.get(post_id=post_id)
         true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
         false_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="False")
-        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="dont know")
+        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="questionable")
     except Post.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -106,7 +106,7 @@ def detailed_post_info(request, post_id):
         post = Post.objects.get(post_id=post_id)
         true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
         false_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="False")
-        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="dont know")
+        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="questionable")
     except Post.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
