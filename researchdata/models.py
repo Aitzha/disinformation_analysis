@@ -20,6 +20,12 @@ class Post(models.Model):
         return self.post_id
 
 
+class Variable(models.Model):
+    name = models.CharField(max_length=256, null=False, blank=False, primary_key=True)
+    description = models.CharField(max_length=256, null=False, blank=False)
+    range = models.CharField(max_length=256, null=False, blank=False)
+
+
 class Personality(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mac1 = models.IntegerField()
@@ -53,15 +59,12 @@ class Personality(models.Model):
     risk6 = models.IntegerField()
     risk7 = models.IntegerField()
 
-class Response(models.Model):
+
+class User_Response(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reason = models.CharField(max_length=512, null=False, blank=False)
-    verbal_code = models.CharField(max_length=256, null=False, blank=False)
-    post_status_opinion = models.CharField(max_length=256, null=False, blank=False)
+    generalized_reason = models.CharField(max_length=256, null=False, blank=False)
+    assumption = models.CharField(max_length=256, null=False, blank=False)
     correctness = models.BooleanField(null=False, blank=False)
-
-class Variable(models.Model):
-    name = models.CharField(max_length=256, null=False, blank=False, primary_key=True)
-    description = models.CharField(max_length=256, null=False, blank=False)
 

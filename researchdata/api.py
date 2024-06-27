@@ -24,7 +24,7 @@ def simple_user_info(request, user_id):
 def simple_user_responses(request, user_id):
     try:
         user = User.objects.get(user_id=user_id)
-        responses = Response.objects.filter(user_id=user_id)
+        responses = User_Response.objects.filter(user_id=user_id)
     except User.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -63,7 +63,7 @@ def user_info(request, user_id):
 def user_responses(request, user_id):
     try:
         user = User.objects.get(user_id=user_id)
-        responses = Response.objects.filter(user_id=user_id)
+        responses = User_Response.objects.filter(user_id=user_id)
     except User.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -78,9 +78,9 @@ def user_responses(request, user_id):
 def post_info(request, post_id):
     try:
         post = Post.objects.get(post_id=post_id)
-        true_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="True")
-        false_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="False")
-        questionable_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="dont know")
+        true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
+        false_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="False")
+        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="dont know")
     except Post.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -104,9 +104,9 @@ def post_info(request, post_id):
 def detailed_post_info(request, post_id):
     try:
         post = Post.objects.get(post_id=post_id)
-        true_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="True")
-        false_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="False")
-        questionable_assumption_responses = Response.objects.filter(post_id=post_id, post_status_opinion="dont know")
+        true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
+        false_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="False")
+        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="dont know")
     except Post.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -139,7 +139,7 @@ def users_ranked(request):
     for user in users:
         user_data = {
             "user": UserSerializer(user).data,
-            "correct_responses": len(Response.objects.filter(user_id=user.user_id, correctness=True))
+            "correct_responses": len(User_Response.objects.filter(user_id=user.user_id, correctness=True))
         }
         user_data_list.append(user_data)
 

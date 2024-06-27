@@ -35,9 +35,9 @@ class ResponseFactory(factory.django.DjangoModelFactory):
     post = factory.SubFactory(PostFactory)
     user = factory.SubFactory(UserFactory)
     reason = "Some reason"
-    verbal_code = "Seems legit"
-    post_status_opinion = "True"
+    generalized_reason = "Seems legit"
+    assumption = "True"
     correctness = True
 
     class Meta:
-        model = Response
+        model = User_Response

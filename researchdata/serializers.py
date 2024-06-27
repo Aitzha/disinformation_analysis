@@ -17,8 +17,8 @@ class PersonalitySerializer(serializers.ModelSerializer):
 
 class ResponseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Response
-        fields = ["post_id", "user_id", "reason", "verbal_code", "post_status_opinion", "correctness"]
+        model = User_Response
+        fields = ["post_id", "user_id", "reason", "generalized_reason", "assumption", "correctness"]
 
 
 class PostSerializer(serializers.ModelSerializer):

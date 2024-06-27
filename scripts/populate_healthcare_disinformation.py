@@ -44,7 +44,7 @@ with open(posts_info_data) as csv_file:
 print("Successfully read posts data csv file")
 
 Personality.objects.all().delete()
-Response.objects.all().delete()
+User_Response.objects.all().delete()
 Post.objects.all().delete()
 User.objects.all().delete()
 
@@ -155,12 +155,12 @@ for response in responses:
 
     post_status_opinionDict = {'0': 'dont know', '1': 'False', '2': 'True'}
     correctnessDict = {'1': True, '2': False}
-    newResponse = Response.objects.create(post_id=posts_objects[response[0]],
-                                          user_id=user_objects[response[1]],
-                                          reason=response[2],
-                                          verbal_code=response[3],
-                                          post_status_opinion=post_status_opinionDict.get(response[4], 'dont know'),
-                                          correctness=correctnessDict.get(response[5]))
+    newResponse = User_Response.objects.create(post_id=posts_objects[response[0]],
+                                               user_id=user_objects[response[1]],
+                                               reason=response[2],
+                                               verbal_code=response[3],
+                                               post_status_opinion=post_status_opinionDict.get(response[4], 'dont know'),
+                                               correctness=correctnessDict.get(response[5]))
 
     newResponse.save()
     responses_loaded += 1
