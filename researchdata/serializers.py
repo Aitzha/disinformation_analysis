@@ -15,7 +15,7 @@ class PersonalitySerializer(serializers.ModelSerializer):
                   "risk1", "risk2", "risk3", "risk4", "risk5", "risk6", "risk7"]
 
 
-class ResponseSerializer(serializers.ModelSerializer):
+class UserResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = User_Response
         fields = ["post_id", "user_id", "reason", "generalized_reason", "assumption", "correctness"]
@@ -25,3 +25,9 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ["post_id", "name", "nature"]
+
+
+class VariableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Variable
+        fields = ["name", "description", "range"]
