@@ -152,13 +152,13 @@ for post_id, data in posts.items():
 print("Successfully saved posts data")
 
 for variable_name, data in variables.items():
-    newVariable = Variable.objects.create(name=variable_name,
+    newVariable = Variable.objects.create(name=variable_name.lower(),
                                           description=data[0],
                                           range=data[1])
 
     newVariable.save()
 
-print("Successfully saved posts data")
+print("Successfully saved variables data")
 
 all_responses = len(responses)
 responses_loaded = 0
