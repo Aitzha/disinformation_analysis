@@ -7,17 +7,11 @@ class User(models.Model):
     ethnicity = models.CharField(max_length=256, null=False, blank=False)
     parent_edu = models.CharField(max_length=256, null=False, blank=False)
 
-    def __str__(self):
-        return self.user_id
-
 
 class Post(models.Model):
     post_id = models.IntegerField(null=False, blank=False, primary_key=True)
     name = models.CharField(max_length=256, null=False, blank=False)
     nature = models.BooleanField(null=False, blank=False)
-
-    def __str__(self):
-        return self.post_id
 
 
 class Variable(models.Model):

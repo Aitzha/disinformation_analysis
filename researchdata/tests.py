@@ -14,7 +14,46 @@ simple_user_data = {
     }
 
 user_data = {
-
+    "user": {
+        "user_id": 1,
+        "gender": "female",
+        "birth_year": 1997,
+        "ethnicity": "white",
+        "parent_edu": "high school/GED"
+    },
+    "personality": {
+        "user_id": 1,
+        "mac1": 5,
+        "mac2": 4,
+        "mac3": 1,
+        "mac4": 2,
+        "mac5": 3,
+        "mac6": 2,
+        "mac7": 2,
+        "mac8": 2,
+        "mac9": 3,
+        "mac10": 1,
+        "mac11": 1,
+        "smds1": 2,
+        "smds2": 3,
+        "smds3": 2,
+        "smds4": 4,
+        "smds5": 4,
+        "smds6": 5,
+        "smds7": 5,
+        "smds8": 2,
+        "smds9": 3,
+        "smds10": 3,
+        "smds11": 4,
+        "smds12": 4,
+        "risk1": 9,
+        "risk2": 7,
+        "risk3": 8,
+        "risk4": 2,
+        "risk5": 8,
+        "risk6": 3,
+        "risk7": 1
+    }
 }
 
 class CheckAPITests(APITestCase):
@@ -133,10 +172,26 @@ class UserAPITests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_sendPostRequest_returnNotFound(self):
+    def test_sendValidData_returnCreated(self):
         url = reverse('user_api', kwargs={'user_id': 0})
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 405)
+        response = self.client.post(url, user_data, format='json')
+        self.assertEqual(response.status_code, 201)
+        response_data = response.json()
+        self.assertEqual(response_data['user']['user_id'], user_data['user']["user_id"])
+
+        try:
+            User.objects.get(user_id=user_data['user']["user_id"])
+        except User.DoesNotExist:
+            self.assertEqual(1, 2)
+        self.assertEqual(1, 1)
+
+    def test_sendInvalidData_returnBadRequest(self):
+        url = reverse('user_api', kwargs={'user_id': 0})
+        data = {
+            'invalidField': 0,
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
 
 
 class UserResponseAPITests(APITestCase):

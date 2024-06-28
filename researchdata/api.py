@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response as Rest_Response
@@ -31,7 +31,7 @@ def simple_user(request, user_id):
 def simple_user_responses(request, user_id):
     try:
         user = User.objects.get(user_id=user_id)
-        responses = User_Response.objects.filter(user_id=user_id)
+        responses = User_Response.objects.filter(user=user_id)
     except User.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -49,8 +49,41 @@ def simple_post(request, post_id):
     return Rest_Response(serialized_post.data)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def user(request, user_id):
+    if request.method == 'POST':
+        try:
+            user_data = request.data['user']
+            personality_data = request.data['personality']
+        except KeyError:
+            return Rest_Response(status=status.HTTP_400_BAD_REQUEST)
+
+        # Serialize user data
+        serialized_user = UserSerializer(data=user_data)
+        if serialized_user.is_valid():
+            # Save the User instance
+            user_instance = serialized_user.save()
+
+            # Set the user field in personality data to the created user instance
+            personality_data['user'] = user_instance.user_id
+            serialized_personality = PersonalitySerializer(data=personality_data)
+
+            if serialized_personality.is_valid():
+                # Save the Personality instance
+                serialized_personality.save()
+
+                return Rest_Response({
+                    'user': serialized_user.data,
+                    'personality': serialized_personality.data
+                }, status=status.HTTP_201_CREATED)
+            else:
+                # Handle invalid personality data
+                user_instance.delete()
+                return Rest_Response(serialized_personality.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Handle invalid user data
+            return Rest_Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         user = User.objects.get(user_id=user_id)
         personality = Personality.objects.get(user_id=user_id)
