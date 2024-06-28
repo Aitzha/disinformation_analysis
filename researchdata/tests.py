@@ -1,12 +1,21 @@
-import json
-from django.test import TestCase
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
-from rest_framework.test import APIRequestFactory, APITestCase
+from rest_framework.test import APITestCase
 
 from .model_factories import *
 from .serializers import *
 
+simple_user_data = {
+        "user_id": 1,
+        "gender": "female",
+        "birth_year": 1997,
+        "ethnicity": "white",
+        "parent_edu": "high school/GED"
+    }
+
+user_data = {
+
+}
 
 class CheckAPITests(APITestCase):
     def test_checkAPI_returnSuccess(self):
@@ -16,7 +25,7 @@ class CheckAPITests(APITestCase):
 
 
 class SimpleUserAPITests(APITestCase):
-    def test_userExist_returnSuccess(self):
+    def test_userExist_returnCorrectUser(self):
         user = UserFactory.create()
         url = reverse('simple_user_api', kwargs={'user_id': user.user_id})
         response = self.client.get(url)
@@ -29,14 +38,30 @@ class SimpleUserAPITests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_sendPostRequest_returnNotFound(self):
+    def test_sendValidData_returnCreated(self):
         url = reverse('simple_user_api', kwargs={'user_id': 0})
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 405)
+        response = self.client.post(url, simple_user_data, format='json')
+        self.assertEqual(response.status_code, 201)
+        response_data = response.json()
+        self.assertEqual(response_data['user_id'], simple_user_data["user_id"])
+
+        try:
+            User.objects.get(user_id=simple_user_data["user_id"])
+        except User.DoesNotExist:
+            self.assertEqual(1, 2)
+        self.assertEqual(1, 1)
+
+    def test_sendInvalidData_returnBadRequest(self):
+        url = reverse('simple_user_api', kwargs={'user_id': 0})
+        data = {
+            'invalidField': 0,
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
 
 
 class SimpleUserResponseAPITests(APITestCase):
-    def test_userExistAndZeroResponses_returnSuccess(self):
+    def test_userExistAndZeroResponses_returnEmptyList(self):
         user = UserFactory.create()
         url = reverse('simple_user_response_api', kwargs={'user_id': user.user_id})
         response = self.client.get(url)
@@ -44,7 +69,7 @@ class SimpleUserResponseAPITests(APITestCase):
         response_data = response.json()
         self.assertEqual(len(response_data), 0)
 
-    def test_userExistAndTwoResponses_returnSuccess(self):
+    def test_userExistAndTwoResponses_returnTwoResponses(self):
         user = UserFactory.create()
         post1 = PostFactory.create(post_id=0)
         post2 = PostFactory.create(post_id=1)

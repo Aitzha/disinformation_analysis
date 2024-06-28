@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response as Rest_Response
@@ -10,8 +10,15 @@ from collections import OrderedDict
 def check(request):
     return HttpResponse(status=200)
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def simple_user(request, user_id):
+    if request.method == 'POST':
+        serialized_user = UserSerializer(data=request.data)
+        if serialized_user.is_valid():
+            serialized_user.save()
+            return Rest_Response(serialized_user.data, status=status.HTTP_201_CREATED)
+        return Rest_Response(serialized_user.data, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         user = User.objects.get(user_id=user_id)
     except User.DoesNotExist:
