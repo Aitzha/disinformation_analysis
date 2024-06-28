@@ -41,3 +41,11 @@ class ResponseFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = User_Response
+
+class VariableFactory(factory.django.DjangoModelFactory):
+    name = "mac1"
+    description = "placeholder"
+    range = "placeholder"
+
+    class Meta:
+        model = Variable
