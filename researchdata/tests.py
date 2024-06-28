@@ -181,6 +181,51 @@ class PostAPITests(APITestCase):
         self.assertEqual(response.status_code, 405)
 
 
+class VariableAPITests(APITestCase):
+    def test_variableExist_returnCorrectVariable(self):
+        variable = VariableFactory.create(name="mac1")
+        url = reverse("variable_api", kwargs={'name': variable.name})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data['name'], variable.name)
+
+    def test_noVariablesExist_return404(self):
+        url = reverse("variable_api", kwargs={'name': 'mac1'})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_sendPostRequest_returnNotFound(self):
+        url = reverse('variable_api', kwargs={'name': 'mac1'})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
+
+
+class AllVariableAPITests(APITestCase):
+    def test_noVariablesExist_returnEmptyList(self):
+        url = reverse("all_variable_api")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(len(response_data), 0)
+
+    def test_twoVariablesExist_returnTwoVariables(self):
+        VariableFactory.create(name="mac1")
+        VariableFactory.create(name="mac2")
+        url = reverse("all_variable_api")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(len(response_data), 2)
+        self.assertEqual(response_data[0]['name'], "mac1")
+        self.assertEqual(response_data[1]['name'], "mac2")
+
+    def test_sendPostRequest_return405(self):
+        url = reverse("all_variable_api")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
+
+
 class DetailedPostAPITests(APITestCase):
     def test_postExistAndNoResponse_returnSuccess(self):
         post = PostFactory.create()

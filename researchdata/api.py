@@ -11,7 +11,7 @@ def check(request):
     return HttpResponse(status=200)
 
 @api_view(['GET'])
-def simple_user_info(request, user_id):
+def simple_user(request, user_id):
     try:
         user = User.objects.get(user_id=user_id)
     except User.DoesNotExist:
@@ -28,11 +28,11 @@ def simple_user_responses(request, user_id):
     except User.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
-    serialized_responses = ResponseSerializer(responses, many=True)
+    serialized_responses = UserResponseSerializer(responses, many=True)
     return Rest_Response(serialized_responses.data)
 
 @api_view(['GET'])
-def simple_post_info(request, post_id):
+def simple_post(request, post_id):
     try:
         post = Post.objects.get(post_id=post_id)
     except Post.DoesNotExist:
@@ -43,7 +43,7 @@ def simple_post_info(request, post_id):
 
 
 @api_view(['GET'])
-def user_info(request, user_id):
+def user(request, user_id):
     try:
         user = User.objects.get(user_id=user_id)
         personality = Personality.objects.get(user_id=user_id)
@@ -68,14 +68,14 @@ def user_responses(request, user_id):
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_user = UserSerializer(user)
-    serialized_responses = ResponseSerializer(responses, many=True)
+    serialized_responses = UserResponseSerializer(responses, many=True)
     combined_data = {"user": serialized_user.data,
                      "responses": serialized_responses.data}
 
     return Rest_Response(combined_data)
 
 @api_view(['GET'])
-def post_info(request, post_id):
+def post(request, post_id):
     try:
         post = Post.objects.get(post_id=post_id)
         true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
@@ -100,8 +100,24 @@ def post_info(request, post_id):
 
     return Rest_Response(combined_data)
 
+
 @api_view(['GET'])
-def detailed_post_info(request, post_id):
+def variable(request, name=None):
+    if name is None:
+        variables = Variable.objects.all()
+        serialized_variables = VariableSerializer(variables, many=True)
+        return Rest_Response(serialized_variables.data)
+    try:
+        variable = Variable.objects.get(name=name)
+    except Variable.DoesNotExist:
+        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
+
+    serialized_variable = VariableSerializer(variable)
+    return Rest_Response(serialized_variable.data)
+
+
+@api_view(['GET'])
+def detailed_post(request, post_id):
     try:
         post = Post.objects.get(post_id=post_id)
         true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
@@ -111,9 +127,9 @@ def detailed_post_info(request, post_id):
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_post = PostSerializer(post)
-    serialized_true_assumption_responses = ResponseSerializer(true_assumption_responses, many=True)
-    serialized_false_assumption_responses = ResponseSerializer(false_assumption_responses, many=True)
-    serialized_questionable_assumption_responses = ResponseSerializer(questionable_assumption_responses, many=True)
+    serialized_true_assumption_responses = UserResponseSerializer(true_assumption_responses, many=True)
+    serialized_false_assumption_responses = UserResponseSerializer(false_assumption_responses, many=True)
+    serialized_questionable_assumption_responses = UserResponseSerializer(questionable_assumption_responses, many=True)
 
     # Extract user IDs of those who assumed the post is true, false and questionable
     true_assumption_user_ids = true_assumption_responses.values_list('user_id', flat=True)
