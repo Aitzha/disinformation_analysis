@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
-from rest_framework.response import Response as Rest_Response
+from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
 from collections import OrderedDict
@@ -16,16 +16,16 @@ def simple_user(request, user_id):
         serialized_user = UserSerializer(data=request.data)
         if serialized_user.is_valid():
             serialized_user.save()
-            return Rest_Response(serialized_user.data, status=status.HTTP_201_CREATED)
-        return Rest_Response(serialized_user.data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serialized_user.data, status=status.HTTP_201_CREATED)
+        return Response(serialized_user.data, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         user = User.objects.get(user_id=user_id)
     except User.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_user = UserSerializer(user)
-    return Rest_Response(serialized_user.data)
+    return Response(serialized_user.data)
 
 @api_view(['GET'])
 def simple_user_responses(request, user_id):
@@ -33,10 +33,10 @@ def simple_user_responses(request, user_id):
         user = User.objects.get(user_id=user_id)
         responses = User_Response.objects.filter(user=user_id)
     except User.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_responses = UserResponseSerializer(responses, many=True)
-    return Rest_Response(serialized_responses.data)
+    return Response(serialized_responses.data)
 
 
 @api_view(['GET', 'POST'])
@@ -46,7 +46,7 @@ def user(request, user_id):
             user_data = request.data['user']
             personality_data = request.data['personality']
         except KeyError:
-            return Rest_Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         # Serialize user data
         serialized_user = UserSerializer(data=user_data)
@@ -62,32 +62,32 @@ def user(request, user_id):
                 # Save the Personality instance
                 serialized_personality.save()
 
-                return Rest_Response({
+                return Response({
                     'user': serialized_user.data,
                     'personality': serialized_personality.data
                 }, status=status.HTTP_201_CREATED)
             else:
                 # Handle invalid personality data
                 user_instance.delete()
-                return Rest_Response(serialized_personality.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serialized_personality.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             # Handle invalid user data
-            return Rest_Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         user = User.objects.get(user_id=user_id)
         personality = Personality.objects.get(user_id=user_id)
     except User.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
     except Personality.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_user = UserSerializer(user)
     serialized_personality = PersonalitySerializer(personality)
     combined_data = {"user": serialized_user.data,
                      "personality": serialized_personality.data}
 
-    return Rest_Response(combined_data)
+    return Response(combined_data)
 
 @api_view(['GET'])
 def user_responses(request, user_id):
@@ -95,21 +95,21 @@ def user_responses(request, user_id):
         user = User.objects.get(user_id=user_id)
         responses = User_Response.objects.filter(user_id=user_id)
     except User.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_user = UserSerializer(user)
     serialized_responses = UserResponseSerializer(responses, many=True)
     combined_data = {"user": serialized_user.data,
                      "responses": serialized_responses.data}
 
-    return Rest_Response(combined_data)
+    return Response(combined_data)
 
 @api_view(['GET'])
 def post(request, post_id):
     try:
         post = Post.objects.get(post_id=post_id)
     except Post.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_post = PostSerializer(post)
     combined_data = {"post": serialized_post.data}
@@ -136,7 +136,7 @@ def post(request, post_id):
         combined_data['false_assumption_responses'] = serialized_false_assumption_responses.data
         combined_data['questionable_assumption_responses'] = serialized_questionable_assumption_responses.data
 
-    return Rest_Response(combined_data)
+    return Response(combined_data)
 
 
 @api_view(['GET'])
@@ -144,14 +144,14 @@ def variable(request, name=None):
     if name is None:
         variables = Variable.objects.all()
         serialized_variables = VariableSerializer(variables, many=True)
-        return Rest_Response(serialized_variables.data)
+        return Response(serialized_variables.data)
     try:
         variable = Variable.objects.get(name=name)
     except Variable.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_variable = VariableSerializer(variable)
-    return Rest_Response(serialized_variable.data)
+    return Response(serialized_variable.data)
 
 @api_view(['GET'])
 def users_ranked(request):
@@ -169,4 +169,4 @@ def users_ranked(request):
     for index, user_data in enumerate(user_data_list):
         json[index] = user_data
 
-    return Rest_Response(json)
+    return Response(json)
