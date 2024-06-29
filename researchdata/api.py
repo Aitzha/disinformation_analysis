@@ -38,16 +38,6 @@ def simple_user_responses(request, user_id):
     serialized_responses = UserResponseSerializer(responses, many=True)
     return Rest_Response(serialized_responses.data)
 
-@api_view(['GET'])
-def simple_post(request, post_id):
-    try:
-        post = Post.objects.get(post_id=post_id)
-    except Post.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
-
-    serialized_post = PostSerializer(post)
-    return Rest_Response(serialized_post.data)
-
 
 @api_view(['GET', 'POST'])
 def user(request, user_id):
@@ -118,25 +108,33 @@ def user_responses(request, user_id):
 def post(request, post_id):
     try:
         post = Post.objects.get(post_id=post_id)
-        true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
-        false_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="False")
-        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="questionable")
     except Post.DoesNotExist:
         return Rest_Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_post = PostSerializer(post)
+    combined_data = {"post": serialized_post.data}
 
-    # Extract user IDs of those who assumed the post is true, false and questionable
-    true_assumption_user_ids = true_assumption_responses.values_list('user_id', flat=True)
-    false_assumption_user_ids = false_assumption_responses.values_list('user_id', flat=True)
-    questionable_assumption_user_ids = questionable_assumption_responses.values_list('user_id', flat=True)
-    response_amount = len(true_assumption_user_ids) + len(false_assumption_user_ids) + len(questionable_assumption_user_ids)
+    if request.path.endswith("/full"):
+        true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
+        false_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="False")
+        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="questionable")
 
-    combined_data = {"post": serialized_post.data,
-                     "total_response_amount": response_amount,
-                     "true_assumption_user_ids": list(true_assumption_user_ids),
-                     "false_assumption_user_ids": list(false_assumption_user_ids),
-                     "questionable_assumption_user_ids": list(questionable_assumption_user_ids)}
+        # Extract user IDs of those who assumed the post is true, false and questionable
+        true_assumption_user_ids = true_assumption_responses.values_list('user_id', flat=True)
+        false_assumption_user_ids = false_assumption_responses.values_list('user_id', flat=True)
+        questionable_assumption_user_ids = questionable_assumption_responses.values_list('user_id', flat=True)
+        response_amount = len(true_assumption_user_ids) + len(false_assumption_user_ids) + len(questionable_assumption_user_ids)
+        combined_data['total_response_amount'] = response_amount
+        combined_data['true_assumption_user_ids'] = list(true_assumption_user_ids)
+        combined_data['false_assumption_user_ids'] = list(false_assumption_user_ids)
+        combined_data['questionable_assumption_user_ids'] = list(questionable_assumption_user_ids)
+
+        serialized_true_assumption_responses = UserResponseSerializer(true_assumption_responses, many=True)
+        serialized_false_assumption_responses = UserResponseSerializer(false_assumption_responses, many=True)
+        serialized_questionable_assumption_responses = UserResponseSerializer(questionable_assumption_responses, many=True)
+        combined_data['true_assumption_responses'] = serialized_true_assumption_responses.data
+        combined_data['false_assumption_responses'] = serialized_false_assumption_responses.data
+        combined_data['questionable_assumption_responses'] = serialized_questionable_assumption_responses.data
 
     return Rest_Response(combined_data)
 
@@ -154,39 +152,6 @@ def variable(request, name=None):
 
     serialized_variable = VariableSerializer(variable)
     return Rest_Response(serialized_variable.data)
-
-
-@api_view(['GET'])
-def detailed_post(request, post_id):
-    try:
-        post = Post.objects.get(post_id=post_id)
-        true_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="True")
-        false_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="False")
-        questionable_assumption_responses = User_Response.objects.filter(post_id=post_id, assumption="questionable")
-    except Post.DoesNotExist:
-        return Rest_Response(status=status.HTTP_404_NOT_FOUND)
-
-    serialized_post = PostSerializer(post)
-    serialized_true_assumption_responses = UserResponseSerializer(true_assumption_responses, many=True)
-    serialized_false_assumption_responses = UserResponseSerializer(false_assumption_responses, many=True)
-    serialized_questionable_assumption_responses = UserResponseSerializer(questionable_assumption_responses, many=True)
-
-    # Extract user IDs of those who assumed the post is true, false and questionable
-    true_assumption_user_ids = true_assumption_responses.values_list('user_id', flat=True)
-    false_assumption_user_ids = false_assumption_responses.values_list('user_id', flat=True)
-    questionable_assumption_user_ids = questionable_assumption_responses.values_list('user_id', flat=True)
-    response_amount = len(true_assumption_user_ids) + len(false_assumption_user_ids) + len(questionable_assumption_user_ids)
-
-    combined_data = {"post": serialized_post.data,
-                     "total_response_amount": response_amount,
-                     "true_assumption_user_ids": list(true_assumption_user_ids),
-                     "false_assumption_user_ids": list(false_assumption_user_ids),
-                     "questionable_assumption_user_ids": list(questionable_assumption_user_ids),
-                     "true_assumption_responses": serialized_true_assumption_responses.data,
-                     "false_assumption_responses": serialized_false_assumption_responses.data,
-                     "questionable_assumption_responses": serialized_questionable_assumption_responses.data}
-
-    return Rest_Response(combined_data)
 
 @api_view(['GET'])
 def users_ranked(request):
