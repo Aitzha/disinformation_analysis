@@ -11,17 +11,6 @@ def check(request):
     return HttpResponse(status=200)
 
 @api_view(['GET'])
-def simple_user_responses(request, user_id):
-    try:
-        user = User.objects.get(user_id=user_id)
-        responses = User_Response.objects.filter(user=user_id)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    serialized_responses = UserResponseSerializer(responses, many=True)
-    return Response(serialized_responses.data)
-
-@api_view(['GET'])
 def user(request, user_id):
     try:
         user = User.objects.get(user_id=user_id)
@@ -39,60 +28,6 @@ def user(request, user_id):
 
         serialized_personality = PersonalitySerializer(personality)
         combined_data["personality"] = serialized_personality.data
-
-    return Response(combined_data)
-
-
-@api_view(['GET', 'POST'])
-def create_user(request):
-    if request.method == 'POST':
-        try:
-            user_data = request.data['user']
-            personality_data = request.data['personality']
-        except KeyError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        # Serialize user data
-        serialized_user = UserSerializer(data=user_data)
-        if serialized_user.is_valid():
-            # Save the User instance
-            user_instance = serialized_user.save()
-
-            # Set the user field in personality data to the created user instance
-            personality_data['user'] = user_instance.user_id
-            serialized_personality = PersonalitySerializer(data=personality_data)
-
-            if serialized_personality.is_valid():
-                # Save the Personality instance
-                serialized_personality.save()
-
-                return Response({
-                    'user': serialized_user.data,
-                    'personality': serialized_personality.data
-                }, status=status.HTTP_201_CREATED)
-            else:
-                # Handle invalid personality data
-                user_instance.delete()
-                return Response(serialized_personality.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            # Handle invalid user data
-            return Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    Response(status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-def user_responses(request, user_id):
-    try:
-        user = User.objects.get(user_id=user_id)
-        responses = User_Response.objects.filter(user_id=user_id)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    serialized_user = UserSerializer(user)
-    serialized_responses = UserResponseSerializer(responses, many=True)
-    combined_data = {"user": serialized_user.data,
-                     "responses": serialized_responses.data}
 
     return Response(combined_data)
 
@@ -131,6 +66,32 @@ def post(request, post_id):
     return Response(combined_data)
 
 @api_view(['GET'])
+def simple_user_responses(request, user_id):
+    try:
+        user = User.objects.get(user_id=user_id)
+        responses = User_Response.objects.filter(user=user_id)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serialized_responses = UserResponseSerializer(responses, many=True)
+    return Response(serialized_responses.data)
+
+@api_view(['GET'])
+def user_responses(request, user_id):
+    try:
+        user = User.objects.get(user_id=user_id)
+        responses = User_Response.objects.filter(user_id=user_id)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serialized_user = UserSerializer(user)
+    serialized_responses = UserResponseSerializer(responses, many=True)
+    combined_data = {"user": serialized_user.data,
+                     "responses": serialized_responses.data}
+
+    return Response(combined_data)
+
+@api_view(['GET'])
 def variable(request, name=None):
     if name is None:
         variables = Variable.objects.all()
@@ -161,3 +122,40 @@ def users_ranked(request):
         json[index] = user_data
 
     return Response(json)
+
+@api_view(['GET', 'POST'])
+def create_user(request):
+    if request.method == 'POST':
+        try:
+            user_data = request.data['user']
+            personality_data = request.data['personality']
+        except KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        # Serialize user data
+        serialized_user = UserSerializer(data=user_data)
+        if serialized_user.is_valid():
+            # Save the User instance
+            user_instance = serialized_user.save()
+
+            # Set the user field in personality data to the created user instance
+            personality_data['user'] = user_instance.user_id
+            serialized_personality = PersonalitySerializer(data=personality_data)
+
+            if serialized_personality.is_valid():
+                # Save the Personality instance
+                serialized_personality.save()
+
+                return Response({
+                    'user': serialized_user.data,
+                    'personality': serialized_personality.data
+                }, status=status.HTTP_201_CREATED)
+            else:
+                # Handle invalid personality data
+                user_instance.delete()
+                return Response(serialized_personality.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Handle invalid user data
+            return Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    Response(status=status.HTTP_200_OK)
