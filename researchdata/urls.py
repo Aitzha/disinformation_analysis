@@ -14,4 +14,5 @@ urlpatterns = [
     path('api/variable/<str:name>', api.variable, name='variable_api'),
     path('api/variable', api.variable, name='all_variable_api'),
     path('api/ranked/users', api.users_ranked, name='users_ranked_api'),
+    path('api/create/user', api.create_user, name='create_user_api')
 ]

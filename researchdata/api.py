@@ -119,34 +119,92 @@ def create_user(request):
     if request.method == 'POST':
         try:
             user_data = request.data['user']
+        except KeyError:
+            return create_only_personality(request)
+
+        try:
             personality_data = request.data['personality']
         except KeyError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return create_only_user(user_data)
 
-        # Serialize user data
-        serialized_user = UserSerializer(data=user_data)
-        if serialized_user.is_valid():
-            # Save the User instance
-            user_instance = serialized_user.save()
+        return create_user_and_personality(user_data, personality_data)
 
-            # Set the user field in personality data to the created user instance
-            personality_data['user'] = user_instance.user_id
-            serialized_personality = PersonalitySerializer(data=personality_data)
+    return Response(status=status.HTTP_200_OK)
 
-            if serialized_personality.is_valid():
-                # Save the Personality instance
-                serialized_personality.save()
 
-                return Response({
-                    'user': serialized_user.data,
-                    'personality': serialized_personality.data
-                }, status=status.HTTP_201_CREATED)
-            else:
-                # Handle invalid personality data
-                user_instance.delete()
-                return Response(serialized_personality.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            # Handle invalid user data
-            return Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
+def create_only_personality(request):
+    try:
+        personality_data = request.data['personality']
+    except KeyError:
+        return Response({
+            'error': "personality section does not exist"
+        }, status=status.HTTP_400_BAD_REQUEST)
 
-    Response(status=status.HTTP_200_OK)
+    try:
+        User.objects.get(user_id=personality_data['user'])
+    except User.DoesNotExist:
+        return Response({
+            'error': "no user by that id",
+            'personality': personality_data
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    serialized_personality = PersonalitySerializer(data=personality_data)
+    if serialized_personality.is_valid():
+        try:
+            Personality.objects.get(user=personality_data['user'])
+        except Personality.DoesNotExist:
+            serialized_personality.save()
+
+            return Response({
+                'personality': personality_data
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            "error": "personality for this user already exist",
+            'personality': personality_data
+        }, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({
+            'error': "personality data is not valid",
+            'personality': personality_data
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+def create_only_user(user_data):
+    serialized_user = UserSerializer(data=user_data)
+    if serialized_user.is_valid():
+        serialized_user.save()
+
+        return Response({
+            'user': user_data
+        }, status=status.HTTP_201_CREATED)
+    else:
+        return Response({
+            'error': "user data is not valid",
+            'user': user_data
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+def create_user_and_personality(user_data, personality_data):
+    serialized_user = UserSerializer(data=user_data)
+    if not serialized_user.is_valid():
+        return Response({
+            'error': "user data is not valid",
+            'user': user_data
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    user_instance = serialized_user.save()
+    personality_data['user'] = user_instance.user_id
+
+    serialized_personality = PersonalitySerializer(data=personality_data)
+    if not serialized_personality.is_valid():
+        user_instance.delete()
+        return Response({
+            'error': "personality data is not valid",
+            'personality': personality_data
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    serialized_personality.save()
+
+    return Response({
+        'user': user_data,
+        'personality': personality_data
+    }, status=status.HTTP_201_CREATED)

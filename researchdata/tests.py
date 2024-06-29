@@ -5,55 +5,69 @@ from rest_framework.test import APITestCase
 from .model_factories import *
 from .serializers import *
 
-simple_user_data = {
-        "user_id": 1,
-        "gender": "female",
-        "birth_year": 1997,
-        "ethnicity": "white",
-        "parent_edu": "high school/GED"
-    }
-
 user_data = {
-    "user": {
-        "user_id": 1,
-        "gender": "female",
-        "birth_year": 1997,
-        "ethnicity": "white",
-        "parent_edu": "high school/GED"
-    },
-    "personality": {
-        "user_id": 1,
-        "mac1": 5,
-        "mac2": 4,
-        "mac3": 1,
-        "mac4": 2,
-        "mac5": 3,
-        "mac6": 2,
-        "mac7": 2,
-        "mac8": 2,
-        "mac9": 3,
-        "mac10": 1,
-        "mac11": 1,
-        "smds1": 2,
-        "smds2": 3,
-        "smds3": 2,
-        "smds4": 4,
-        "smds5": 4,
-        "smds6": 5,
-        "smds7": 5,
-        "smds8": 2,
-        "smds9": 3,
-        "smds10": 3,
-        "smds11": 4,
-        "smds12": 4,
-        "risk1": 9,
-        "risk2": 7,
-        "risk3": 8,
-        "risk4": 2,
-        "risk5": 8,
-        "risk6": 3,
-        "risk7": 1
-    }
+    "user_id": 1,
+    "gender": "female",
+    "birth_year": 1997,
+    "ethnicity": "white",
+    "parent_edu": "high school/GED"
+}
+
+invalid_user_data = {
+    "user_id": 1
+}
+
+personality_data = {
+    "user": 1,
+    "mac1": 5,
+    "mac2": 4,
+    "mac3": 1,
+    "mac4": 2,
+    "mac5": 3,
+    "mac6": 2,
+    "mac7": 2,
+    "mac8": 2,
+    "mac9": 3,
+    "mac10": 1,
+    "mac11": 1,
+    "smds1": 2,
+    "smds2": 3,
+    "smds3": 2,
+    "smds4": 4,
+    "smds5": 4,
+    "smds6": 5,
+    "smds7": 5,
+    "smds8": 2,
+    "smds9": 3,
+    "smds10": 3,
+    "smds11": 4,
+    "smds12": 4,
+    "risk1": 9,
+    "risk2": 7,
+    "risk3": 8,
+    "risk4": 2,
+    "risk5": 8,
+    "risk6": 3,
+    "risk7": 1
+}
+
+invalid_personality_data = {
+    "user": 1
+}
+
+full_user_data = {
+    "user": user_data,
+    "personality": personality_data
+}
+
+full_user_data_with_invalid_user = {
+    "user": invalid_user_data,
+    "personality": personality_data
+}
+
+full_user_data_with_invalid_personality = {
+    "user": user_data,
+    "personality": invalid_personality_data
 }
 
 
@@ -238,25 +252,76 @@ class RankedUsersAPITests(APITestCase):
 
 
 class CreateUserAPITests(APITestCase):
-    def test(self):
+    def test_sendValidUserData_returnCreated(self):
+        url = reverse('create_user_api')
+        response = self.client.post(url, {"user": user_data}, format='json')
+        self.assertEqual(response.status_code, 201)
+        response_data = response.json()
+        self.assertEqual(response_data['user']['user_id'], user_data["user_id"])
+
+        try:
+            User.objects.get(user_id=user_data["user_id"])
+        except User.DoesNotExist:
+            self.assertEqual(1, 2)
         self.assertEqual(1, 1)
-    # def test_sendValidData_returnCreated(self):
-    #     url = reverse('user_api', kwargs={'user_id': 0})
-    #     response = self.client.post(url, user_data, format='json')
-    #     self.assertEqual(response.status_code, 201)
-    #     response_data = response.json()
-    #     self.assertEqual(response_data['user']['user_id'], user_data['user']["user_id"])
-    #
-    #     try:
-    #         User.objects.get(user_id=user_data['user']["user_id"])
-    #     except User.DoesNotExist:
-    #         self.assertEqual(1, 2)
-    #     self.assertEqual(1, 1)
-    #
-    # def test_sendInvalidData_returnBadRequest(self):
-    #     url = reverse('user_api', kwargs={'user_id': 0})
-    #     data = {
-    #         'invalidField': 0,
-    #     }
-    #     response = self.client.post(url, data, format='json')
-    #     self.assertEqual(response.status_code, 400)
+
+    def test_sendInvalidUserData_returnBadRequest(self):
+        url = reverse('create_user_api')
+        response = self.client.post(url, {"user": invalid_user_data}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_sendNoUserData_returnBadRequest(self):
+        url = reverse('create_user_api')
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_sendValidPersonalityDataAndUserExist_returnCreated(self):
+        UserFactory.create(user_id=user_data["user_id"])
+        url = reverse('create_user_api')
+        response = self.client.post(url, {"personality": personality_data}, format='json')
+        self.assertEqual(response.status_code, 201)
+        response_data = response.json()
+        self.assertEqual(response_data['personality']['user'], personality_data["user"])
+
+        try:
+            Personality.objects.get(user=user_data["user_id"])
+        except Personality.DoesNotExist:
+            self.assertEqual(1, 2)
+        self.assertEqual(1, 1)
+
+    def test_sendValidPersonalityDataAndNoUserExist_returnBadRequest(self):
+        url = reverse('create_user_api')
+        response = self.client.post(url, {"personality": personality_data}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_sendInvalidPersonalityData_returnBadRequest(self):
+        url = reverse('create_user_api')
+        response = self.client.post(url, {"personality": personality_data}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_sendValidFullUserData_returnCreated(self):
+        url = reverse('create_user_api')
+        response = self.client.post(url, full_user_data, format='json')
+        self.assertEqual(response.status_code, 201)
+        response_data = response.json()
+        self.assertEqual(response_data['user']['user_id'], full_user_data["user"]['user_id'])
+        self.assertEqual(response_data['personality']['user'], full_user_data["personality"]['user'])
+
+        try:
+            User.objects.get(user_id=user_data["user_id"])
+            Personality.objects.get(user=user_data["user_id"])
+        except User.DoesNotExist:
+            self.assertEqual(1, 2)
+        except Personality.DoesNotExist:
+            self.assertEqual(1, 2)
+        self.assertEqual(1, 1)
+
+    def test_sendInvalidUserAndValidPersonality_returnBadRequest(self):
+        url = reverse('create_user_api')
+        response = self.client.post(url, full_user_data_with_invalid_user, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_sendValidUserAndInvalidPersonality_returnBadRequest(self):
+        url = reverse('create_user_api')
+        response = self.client.post(url, full_user_data_with_invalid_personality, format='json')
+        self.assertEqual(response.status_code, 400)
