@@ -66,28 +66,19 @@ def post(request, post_id):
     return Response(combined_data)
 
 @api_view(['GET'])
-def simple_user_responses(request, user_id):
-    try:
-        user = User.objects.get(user_id=user_id)
-        responses = User_Response.objects.filter(user=user_id)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    serialized_responses = UserResponseSerializer(responses, many=True)
-    return Response(serialized_responses.data)
-
-@api_view(['GET'])
 def user_responses(request, user_id):
     try:
         user = User.objects.get(user_id=user_id)
-        responses = User_Response.objects.filter(user_id=user_id)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     serialized_user = UserSerializer(user)
-    serialized_responses = UserResponseSerializer(responses, many=True)
-    combined_data = {"user": serialized_user.data,
-                     "responses": serialized_responses.data}
+    combined_data = {"user": serialized_user.data}
+
+    if request.path.endswith("/full"):
+        responses = User_Response.objects.filter(user_id=user_id)
+        serialized_responses = UserResponseSerializer(responses, many=True)
+        combined_data['responses'] = serialized_responses.data
 
     return Response(combined_data)
 
