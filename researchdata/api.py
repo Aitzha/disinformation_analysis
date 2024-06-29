@@ -10,23 +10,6 @@ from collections import OrderedDict
 def check(request):
     return HttpResponse(status=200)
 
-@api_view(['GET', 'POST'])
-def simple_user(request, user_id):
-    if request.method == 'POST':
-        serialized_user = UserSerializer(data=request.data)
-        if serialized_user.is_valid():
-            serialized_user.save()
-            return Response(serialized_user.data, status=status.HTTP_201_CREATED)
-        return Response(serialized_user.data, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        user = User.objects.get(user_id=user_id)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    serialized_user = UserSerializer(user)
-    return Response(serialized_user.data)
-
 @api_view(['GET'])
 def simple_user_responses(request, user_id):
     try:
@@ -38,9 +21,30 @@ def simple_user_responses(request, user_id):
     serialized_responses = UserResponseSerializer(responses, many=True)
     return Response(serialized_responses.data)
 
+@api_view(['GET'])
+def user(request, user_id):
+    try:
+        user = User.objects.get(user_id=user_id)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serialized_user = UserSerializer(user)
+    combined_data = {"user": serialized_user.data}
+
+    if request.path.endswith("/full"):
+        try:
+            personality = Personality.objects.get(user_id=user_id)
+        except Personality.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serialized_personality = PersonalitySerializer(personality)
+        combined_data["personality"] = serialized_personality.data
+
+    return Response(combined_data)
+
 
 @api_view(['GET', 'POST'])
-def user(request, user_id):
+def create_user(request):
     if request.method == 'POST':
         try:
             user_data = request.data['user']
@@ -74,20 +78,8 @@ def user(request, user_id):
             # Handle invalid user data
             return Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        user = User.objects.get(user_id=user_id)
-        personality = Personality.objects.get(user_id=user_id)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    except Personality.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    Response(status=status.HTTP_200_OK)
 
-    serialized_user = UserSerializer(user)
-    serialized_personality = PersonalitySerializer(personality)
-    combined_data = {"user": serialized_user.data,
-                     "personality": serialized_personality.data}
-
-    return Response(combined_data)
 
 @api_view(['GET'])
 def user_responses(request, user_id):
@@ -137,7 +129,6 @@ def post(request, post_id):
         combined_data['questionable_assumption_responses'] = serialized_questionable_assumption_responses.data
 
     return Response(combined_data)
-
 
 @api_view(['GET'])
 def variable(request, name=None):
