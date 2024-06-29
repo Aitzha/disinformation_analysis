@@ -239,7 +239,7 @@ class FullPostAPITests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_sendPostRequest_returnNotFound(self):
+    def test_sendPostRequest_returnMethodNotAllowed(self):
         url = reverse('full_post_api', kwargs={'post_id': 0})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
@@ -291,24 +291,27 @@ class AllVariableAPITests(APITestCase):
 
 
 class RankedUsersAPITests(APITestCase):
-    def test_noUsersExist_returnSuccess(self):
+    def test_noUsersExist_returnEmptyJson(self):
         url = reverse('users_ranked_api')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         self.assertEqual(len(response_data), 0)
 
-    def test_twoUsersExist_returnSuccess(self):
+    def test_twoUsersExist_returnCorrectJson(self):
         UserFactory.create(user_id=0)
-        UserFactory.create(user_id=1)
+        user = UserFactory.create(user_id=1)
+        post = PostFactory.create()
+        ResponseFactory.create(user=user, post=post)
         url = reverse('users_ranked_api')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         self.assertEqual(len(response_data), 2)
+        self.assertEqual(response_data['0']['user']['user_id'], 1)
+        self.assertEqual(response_data['1']['user']['user_id'], 0)
 
-    def test_sendPostRequest_returnNotFound(self):
+    def test_sendPostRequest_returnMethodNotAllowed(self):
         url = reverse('users_ranked_api')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
-
