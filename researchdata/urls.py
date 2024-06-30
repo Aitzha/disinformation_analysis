@@ -1,5 +1,4 @@
-from django.urls import include, path
-from . import views
+from django.urls import path
 from . import api
 
 urlpatterns = [
