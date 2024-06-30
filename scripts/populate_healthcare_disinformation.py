@@ -4,13 +4,12 @@ import django
 import csv
 from collections import defaultdict
 
-sys.path.append('D:/projects/Advanced Web Development/disinformation_analysis')
+project_path = os.getenv('PROJECT_PATH')
+sys.path.append(project_path)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "disinformation_analysis.settings")
 django.setup()
 
 from researchdata.models import *
-
-project_path = os.getenv('PROJECT_PATH')
 heathcare_disinfo_data = project_path + "/data/Healthcare_Disinfo_Study_Data.csv"
 posts_info_data = project_path + "/data/Posts_info.csv"
 variables_info_data = project_path + "/data/Variables_info.csv"
