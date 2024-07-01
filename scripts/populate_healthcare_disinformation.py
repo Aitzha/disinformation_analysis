@@ -50,6 +50,8 @@ with open(variables_info_data) as csv_file:
     for row in csv_reader:
         variables[row[0]] = row[1:3]
 
+print("Successfully read variables data csv file")
+
 
 Personality.objects.all().delete()
 User_Response.objects.all().delete()
