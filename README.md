@@ -6,39 +6,47 @@ why people believe disinformation about healthcare.
 
 
 ## Endpoints
-- Endpoint 1
-- Endpoint 2
-- Endpoint 3
+- api
+- api/user/<user_id>
+- api/user/<user_id>/full
+- api/post/<post_id>
+- api/post/<post_id>/full
+- api/variable/<variable_name>
+- api/variable/
+- api/ranked/users
+- api/create/user
 
-### Requirements
-- Python 3.x
-- Django 3.x or later
-- Pip (Python package installer)
-- Virtualenv (optional, but recommended)
 
 ### Clone the Repository
 ```
-git clone https://github.com/yourusername/yourproject.git
-cd yourproject
+git clone https://github.com/Aitzha/disinformation_analysis.git
+cd disinformation_analysis
 ```
 
 ### Create and Activate a Virtual Environment for Windows
 ```
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+python -m venv myenv # Alternatively if you have virtualenv 'virtualenv myenv'
+source myenv\Scripts\activate
+```
+
+### Create and Activate a Virtual Environment for Linux and MacOS
+```
+python3 -m venv myenv # Alternatively if you have virtualenv 'virtualenv myenv'
+source myenv/bin/activate
 ```
 
 ### Install Dependencies
 ```
-pip install factory_boy
-pip install djangorestframework
+pip install -r requirements.txt
 ```
 
 ### Migration
 ```
 python manage.py migrate
-$env:PROJECT_PATH="path"
-python .\scripts\populate_healthcare_disinformation.py
+$env:PROJECT_PATH="path" # on Windows PowerShell
+set PROJECT_PATH=path # on Windows Command Prompt
+export PROJECT_PATH=”path” # On Linux and MacOS 
+python .\script\populate_healthcare_disinformation.py
 ```
 
 ### Testing
@@ -46,3 +54,7 @@ python .\scripts\populate_healthcare_disinformation.py
 python manage.py test
 ```
 
+### Run the Application
+```
+python manage.py runserver
+```
