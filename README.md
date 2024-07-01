@@ -46,7 +46,7 @@ python manage.py migrate
 $env:PROJECT_PATH="path" # on Windows PowerShell
 set PROJECT_PATH=path # on Windows Command Prompt
 export PROJECT_PATH=”path” # On Linux and MacOS 
-python .\script\populate_healthcare_disinformation.py
+python .\scripts\populate_healthcare_disinformation.py
 ```
 
 ### Testing
